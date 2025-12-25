@@ -5,8 +5,10 @@ uv = "latest"
 [settings]
 python.uv_venv_auto = true
 
-[tasks.query-API]
-description = 'Start Generator'
-run = "uv run main.py"
+#[tasks.query-API]
+#description = 'Start CLI Agent'
+#run = "uv run main.py"
 
-
+[tasks.start-server]
+description = 'Run local test'
+run = "python3 -m http.server 8888 -d public"
