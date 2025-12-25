@@ -7,7 +7,11 @@ python.uv_venv_auto = true
 
 [tasks.run]
 description = 'Run Site Generator'
-run = "uv run main.py"
+run = "./main.sh"
+
+[tasks.test]
+description = 'Test Site Generator'
+run = "./test.sh"
 
 [tasks.start-server]
 description = 'Start Local Server'
