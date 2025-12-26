@@ -33,7 +33,7 @@ class LeafNode(HTMLNode):
 
 
     def to_html(self):
-        if not self.value:
+        if self.value is None:
             raise ValueError("LeafNode must have a value")
         if not self.tag:
             return self.value
@@ -59,51 +59,38 @@ class ParentNode(HTMLNode):
 
 
 def text_node_to_html_node(text_node):
-    if text_node.text_type not in TextType:
-        raise Exception("Not a valid TextType")
-    else:
+    if text_node.text_type == TextType.TEXT:
+        tag = None
         value = text_node.text
-
-        if text_node.text_type == TextType.TEXT:
-            tag = "p"
-        if text_node.text_type == TextType.BOLD:
-            tag = "b"
-        if text_node.text_type == TextType.ITALIC:
-            tag = "i"
-        if text_node.text_type == TextType.CODE:
-            tag = "code"
-        if text_node.text_type == TextType.LINK:
-            tag = "a"
-            props = text_node.url
-            # <a href="https://www.google.com">link</a>
-        if text_node.text_type == TextType.IMAGE:
-            tag = "img"
-            props = text_node.url
-            # <img src="url/of/image.jpg" alt="Description of image" />
-
-        new_leaf = LeafNode(tag, value, None, props)
-        return new_leaf
+        props = None
+    elif text_node.text_type == TextType.BOLD:
+        tag = "b"
+        value = text_node.text
+        props = None
+    elif text_node.text_type == TextType.ITALIC:
+        tag = "i"
+        value = text_node.text
+        props = None
+    elif text_node.text_type == TextType.CODE:
+        tag = "code"
+        value = text_node.text
+        props = None
+    elif text_node.text_type == TextType.LINK:
+        tag = "a"
+        value = text_node.text
+        props = {
+            "href": text_node.url,
+            "target": "_blank",
+        }
+    elif text_node.text_type == TextType.IMAGE:
+        tag = "img"
+        value = ""
+        props = {
+            "src": text_node.url,
+            "alt": text_node.text,
+        }
+    else:
+        raise Exception("Not a valid TextType")
+    new_leaf = LeafNode(tag, value, props)
+    return new_leaf
     
-
-
-""" 
-example dict
-{
-    "href": "https://www.google.com",
-    "target": "_blank",
-}
- """
-
-""" 
-It should handle each type of the TextType enum. 
-If it gets a TextNode that is none of those types, it should raise an exception.
-Otherwise, it should return a new LeafNode object.
-
-
-TextType.TEXT: This should return a LeafNode with no tag, just a raw text value.
-TextType.BOLD: This should return a LeafNode with a "b" tag and the text
-TextType.ITALIC: "i" tag, text
-TextType.CODE: "code" tag, text
-TextType.LINK: "a" tag, anchor text, and "href" prop
-TextType.IMAGE: "img" tag, empty string value, "src" and "alt" props ("src" is the image URL, "alt" is the alt text)
- """
