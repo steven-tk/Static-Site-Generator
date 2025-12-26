@@ -1,4 +1,4 @@
-
+from textnode import TextNode, TextType
 
 class HTMLNode:
 
@@ -55,3 +55,55 @@ class ParentNode(HTMLNode):
         for child in self.children:
             child_list.append(child.to_html())
         return f'<{self.tag}{self.props_to_html()}>{"".join(child_list)}</{self.tag}>'
+
+
+
+def text_node_to_html_node(text_node):
+    if text_node.text_type not in TextType:
+        raise Exception("Not a valid TextType")
+    else:
+        value = text_node.text
+
+        if text_node.text_type == TextType.TEXT:
+            tag = "p"
+        if text_node.text_type == TextType.BOLD:
+            tag = "b"
+        if text_node.text_type == TextType.ITALIC:
+            tag = "i"
+        if text_node.text_type == TextType.CODE:
+            tag = "code"
+        if text_node.text_type == TextType.LINK:
+            tag = "a"
+            props = text_node.url
+            # <a href="https://www.google.com">link</a>
+        if text_node.text_type == TextType.IMAGE:
+            tag = "img"
+            props = text_node.url
+            # <img src="url/of/image.jpg" alt="Description of image" />
+
+        new_leaf = LeafNode(tag, value, None, props)
+        return new_leaf
+    
+
+
+""" 
+example dict
+{
+    "href": "https://www.google.com",
+    "target": "_blank",
+}
+ """
+
+""" 
+It should handle each type of the TextType enum. 
+If it gets a TextNode that is none of those types, it should raise an exception.
+Otherwise, it should return a new LeafNode object.
+
+
+TextType.TEXT: This should return a LeafNode with no tag, just a raw text value.
+TextType.BOLD: This should return a LeafNode with a "b" tag and the text
+TextType.ITALIC: "i" tag, text
+TextType.CODE: "code" tag, text
+TextType.LINK: "a" tag, anchor text, and "href" prop
+TextType.IMAGE: "img" tag, empty string value, "src" and "alt" props ("src" is the image URL, "alt" is the alt text)
+ """
