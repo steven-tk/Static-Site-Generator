@@ -1,4 +1,5 @@
 import unittest
+
 from htmlnode import HTMLNode, LeafNode, ParentNode
 
 
@@ -88,8 +89,8 @@ class TestParentNode(unittest.TestCase):
         parent_node = ParentNode("div", [child_node])
         self.assertEqual(
             parent_node.to_html(),
-             "<div><span><b>grandchild</b></span></div>",
-         )
+            "<div><span><b>grandchild</b></span></div>",
+        )
 
     # Parent with multiple LeafNode children (mix of tags and raw text)
     def test_parent_multiple_leaf_children(self):
