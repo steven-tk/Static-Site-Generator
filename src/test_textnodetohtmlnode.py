@@ -1,7 +1,12 @@
 import unittest
 
 from textnode import TextNode, TextType
-from htmlnode import text_node_to_html_node
+from htmlnode import HTMLNode, text_node_to_html_node
+
+# Quickfix cause i can't be bothered right now
+def assert_has_props(node: HTMLNode) -> dict[str, str]:
+    assert node.props is not None
+    return node.props
 
 
 class TestTextToNode(unittest.TestCase):
@@ -39,16 +44,18 @@ class TestTextToNode(unittest.TestCase):
         html_node = text_node_to_html_node(node)
         self.assertEqual(html_node.tag, "a")
         self.assertEqual(html_node.value, "Example")
-        self.assertEqual(html_node.props["href"], "https://example.com")
-        self.assertEqual(html_node.props["target"], "_blank")
+        props = assert_has_props(html_node)
+        self.assertEqual(props["href"], "https://example.com")
+        self.assertEqual(props["target"], "_blank")
 
     def test_image(self):
         node = TextNode("Alt text", TextType.IMAGE, "image.png")
         html_node = text_node_to_html_node(node)
         self.assertEqual(html_node.tag, "img")
         self.assertEqual(html_node.value, "")
-        self.assertEqual(html_node.props["src"], "image.png")
-        self.assertEqual(html_node.props["alt"], "Alt text")
+        props = assert_has_props(html_node)
+        self.assertEqual(props["src"], "image.png") # type: ignore[index]
+        self.assertEqual(props["alt"], "Alt text") # type: ignore[index]
 
     def test_invalid_type_raises(self):
         node = TextNode("oops", None)
@@ -74,12 +81,14 @@ class TestTextToNode(unittest.TestCase):
     def test_link_missing_url(self):
         node = TextNode("Example", TextType.LINK, None)
         html_node = text_node_to_html_node(node)
-        self.assertEqual(html_node.props["href"], None)
+        props = assert_has_props(html_node)
+        self.assertEqual(props["href"], None)
 
     def test_image_empty_alt(self):
         node = TextNode("", TextType.IMAGE, "image.png")
         html_node = text_node_to_html_node(node)
-        self.assertEqual(html_node.props["alt"], "")
+        props = assert_has_props(html_node)
+        self.assertEqual(props["alt"], "")
 
     def test_invalid_text_type_object(self):
         class FakeType:
