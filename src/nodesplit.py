@@ -25,32 +25,6 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     return new_nodes
 
 
-# Old Version
-""" def split_nodes_delimiter(old_nodes, delimiter, text_type):
-    result = []
-    for node in old_nodes:
-        split_node = []
-        if node.text_type != TextType.TEXT:
-            result.append(node)
-        
-        
-        if node.text.count(delimiter) // 2 == 0 and node.text.count(delimiter) > 2:
-            raise Exception("Multiple Markdown elements of the same type")
-
-        if node.text.count(delimiter) != 2:
-            raise Exception("Invalid Markdown syntax")
-
-        split_node = node.text.split(delimiter)
-        front = TextNode(split_node[0], TextType.TEXT)
-        nested = TextNode(split_node[1], text_type)
-        end = TextNode(split_node[2], TextType.TEXT)
-
-        new_nodes = [front, nested, end]
-        result.extend(new_nodes)
-    print(result)
-    return result """
-
-
 def extract_markdown_images(text):
     matches = re.findall(r"""
         !\[          # literal '!['
@@ -61,7 +35,7 @@ def extract_markdown_images(text):
         \)           # closing parenthesis
     """, text, re.VERBOSE)
     return matches
-
+# e.g. [("Link1", "url1"), ("Link2", "url2")] for two
 
 
 def extract_markdown_links(text):
@@ -78,9 +52,56 @@ def extract_markdown_links(text):
 
 
 def split_nodes_image(old_nodes):
-    pass
+    new_nodes = []
+
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT:
+            new_nodes.append(node)
+            continue
+
+        text = node.text
+        while text != "":
+            
+            data_list = extract_markdown_images(text)
+            if not data_list:
+                new_nodes.append(TextNode(text, TextType.TEXT))
+                break
+
+            alt, link = data_list[0]
+            parts = text.split(f"![{alt}]({link})", 1)
+
+            if parts[0] != "":
+                new_nodes.append(TextNode(parts[0], TextType.TEXT))
+            new_nodes.append(TextNode(alt, TextType.IMAGE, link))
+
+            text = str(parts[1])
+
+    return new_nodes
 
 
 def split_nodes_link(old_nodes):
-    pass
+    new_nodes = []
 
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT:
+            new_nodes.append(node)
+            continue
+
+        text = node.text
+        while text != "":
+            
+            data_list = extract_markdown_links(text)
+            if not data_list:
+                new_nodes.append(TextNode(text, TextType.TEXT))
+                break
+
+            alt, link = data_list[0]
+            parts = text.split(f"[{alt}]({link})", 1)
+
+            if parts[0] != "":
+                new_nodes.append(TextNode(parts[0], TextType.TEXT))
+            new_nodes.append(TextNode(alt, TextType.LINK, link))
+
+            text = str(parts[1])
+
+    return new_nodes
