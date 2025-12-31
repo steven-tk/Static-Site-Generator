@@ -15,3 +15,7 @@ def markdown_to_blocks(markdown):
 
     return blocks
 
+
+def markdown_to_html_node(markdown):
+    pass
+

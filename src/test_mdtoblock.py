@@ -1,5 +1,6 @@
 import unittest
 from markdown import markdown_to_blocks
+from blocknode import BlockType, block_to_block_type
 
 
 # ===============
@@ -8,10 +9,10 @@ from markdown import markdown_to_blocks
 # ===============
 
 
-class TestPLACEHOLDER(unittest.TestCase):
+class TestBlockSplit(unittest.TestCase):
 
     # ===============
-    # PLACEHOLDER Tests
+    # BlockSplit Tests
     # ===============
 
     def test_markdown_to_blocks(self):
@@ -108,6 +109,47 @@ This is the same paragraph on a new line
         md = "   \n\n   \n"
         blocks = markdown_to_blocks(md)
         self.assertEqual(blocks, [])
+
+
+class TestBlockType(unittest.TestCase):
+
+    # ===============
+    # BlockType Tests
+    # ===============
+
+    def test_heading_levels(self):
+        for i in range(1, 7):
+            block = "#" * i + " heading"
+            self.assertEqual(block_to_block_type(block), BlockType.HEAD)
+
+    def test_code_block(self):
+        block = "```\ncode here\n```"
+        self.assertEqual(block_to_block_type(block), BlockType.CODE)
+
+    def test_quote_block(self):
+        block = "> quote\n> still quote"
+        self.assertEqual(block_to_block_type(block), BlockType.QUOTE)
+
+    def test_unordered_list(self):
+        block = "- item one\n- item two"
+        self.assertEqual(block_to_block_type(block), BlockType.ULIST)
+
+    def test_ordered_list(self):
+        block = "1. first\n2. second\n3. third"
+        self.assertEqual(block_to_block_type(block), BlockType.OLIST)
+
+    def test_invalid_ordered_list(self):
+        block = "1. first\n3. third"
+        self.assertEqual(block_to_block_type(block), BlockType.PARA)
+
+    def test_mixed_block_is_paragraph(self):
+        block = "> quote\nnot quote"
+        self.assertEqual(block_to_block_type(block), BlockType.PARA)
+
+
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
