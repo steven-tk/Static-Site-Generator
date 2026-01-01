@@ -93,4 +93,3 @@ def text_node_to_html_node(text_node):
         raise Exception("Not a valid TextType")
     new_leaf = LeafNode(tag, value, props)
     return new_leaf
-    

@@ -117,4 +117,3 @@ def text_to_textnodes(text):
     link_split = split_nodes_link(image_split)
 
     return link_split
-
